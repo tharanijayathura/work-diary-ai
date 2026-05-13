@@ -88,9 +88,13 @@ export class DiaryController {
       );
     }
 
+    const internship = (entry as any).internship;
+    const role = internship?.role || '';
+    const company = internship?.companyName || '';
+
     const [polishedContent, detectedSkills] = await Promise.all([
-      this.aiService.polishDiaryEntry(entry.roughNotes),
-      this.aiService.detectSkills(entry.roughNotes),
+      this.aiService.polishDiaryEntry(entry.roughNotes, role, company),
+      this.aiService.detectSkills(entry.roughNotes, role),
     ]);
 
     return this.diaryService.update(id, {
@@ -113,7 +117,9 @@ export class DiaryController {
       throw new BadRequestException('Entry has no content for skill detection.');
     }
 
-    const detectedSkills = await this.aiService.detectSkills(text);
+    const internship = (entry as any).internship;
+    const role = internship?.role || '';
+    const detectedSkills = await this.aiService.detectSkills(text, role);
     return this.diaryService.update(id, { skills: detectedSkills });
   }
 }

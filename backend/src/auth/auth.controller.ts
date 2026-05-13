@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 interface SignupRequest {
@@ -24,5 +24,10 @@ export class AuthController {
   @Post('login')
   login(@Body() body: LoginRequest) {
     return this.authService.login(body);
+  }
+
+  @Post('profile/:id')
+  updateProfile(@Body() body: { name?: string; email?: string; password?: string }, @Param('id') id: string) {
+    return this.authService.updateProfile(id, body);
   }
 }

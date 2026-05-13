@@ -112,4 +112,37 @@ export class AuthService {
       user: safeUser,
     };
   }
+
+  async updateProfile(userId: string, data: { name?: string; email?: string; password?: string }) {
+    if (!userId) {
+      throw new BadRequestException('User ID is required.');
+    }
+
+    const updateData: any = {};
+    if (data.name) updateData.name = data.name.trim();
+    if (data.email) updateData.email = normalizeEmail(data.email);
+    if (data.password) updateData.passwordHash = hashPassword(data.password);
+
+    try {
+      const user = await this.prisma.user.update({
+        where: { id: userId },
+        data: updateData,
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          avatarUrl: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      return {
+        message: 'Profile updated successfully.',
+        user,
+      };
+    } catch (error) {
+      throw new BadRequestException('Failed to update profile. Email might be in use.');
+    }
+  }
 }

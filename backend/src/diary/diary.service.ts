@@ -26,7 +26,10 @@ export class DiaryService {
   }
 
   async findOne(id: string) {
-    const entry = await this.prisma.diaryEntry.findUnique({ where: { id } });
+    const entry = await this.prisma.diaryEntry.findUnique({ 
+      where: { id },
+      include: { internship: true }
+    });
     if (!entry) throw new NotFoundException('Diary entry not found');
     return entry;
   }
