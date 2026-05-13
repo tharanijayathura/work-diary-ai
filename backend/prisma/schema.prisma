@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String?
+  avatarUrl    String?
+  passwordHash String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  internships   Internship[]
+  reports       Report[]
+  notifications Notification[]
+}
+
+model Internship {
+  id          String   @id @default(uuid())
+  userId      String
+  companyName String
+  role        String
+  supervisor  String?
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  skills      String[]
+  status      String   @default("ACTIVE") // ACTIVE, COMPLETED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  diaryEntries DiaryEntry[]
+  reports      Report[]
+}
+
+model DiaryEntry {
+  id           String   @id @default(uuid())
+  internshipId String
+  title        String?
+  roughNotes   String?  // Original notes
+  content      String   // AI generated or edited professional content
+  mood         String?
+  hoursWorked  Float?
+  attachments  String[] // URLs of uploaded files
+  skills       String[] // AI detected skills
+  isDraft      Boolean  @default(false)
+  supervisorComments String? // Comments from supervisor
+  entryDate    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  internship Internship @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+}
+
+model Report {
+  id           String   @id @default(uuid())
+  userId       String
+  internshipId String
+  type         String   // WEEKLY, MONTHLY, FINAL
+  content      String   // Generated report text
+  fileUrl      String?  // Link to PDF/DOCX if generated
+  supervisorComments String? // Comments from supervisor
+  isPublic     Boolean  @default(false) // For public sharing link
+  startDate    DateTime
+  endDate      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  internship Internship @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      String   // REMINDER, SYSTEM
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
