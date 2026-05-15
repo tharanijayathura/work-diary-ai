@@ -5,12 +5,9 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Allow the Next.js frontend to call this API
+  // Allow any origin to call this API (robust for multiple Vercel preview URLs)
   app.enableCors({
-    origin: [
-      process.env.FRONTEND_URL || 'http://localhost:3000',
-      'https://work-diary-ai.vercel.app'
-    ],
+    origin: true,
     credentials: true,
   });
 
