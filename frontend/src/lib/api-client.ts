@@ -1,5 +1,13 @@
 function getApiBaseUrl() {
-  const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(/\/$/, "");
+  // Get URL and remove any trailing slashes
+  let apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").trim().replace(/\/$/, "");
+  
+  // Ensure it starts with http/https
+  if (!apiUrl.startsWith("http")) {
+    apiUrl = `https://${apiUrl}`;
+  }
+
+  // Ensure it ends with /api
   return apiUrl.endsWith("/api") ? apiUrl : `${apiUrl}/api`;
 }
 
